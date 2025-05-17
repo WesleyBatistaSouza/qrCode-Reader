@@ -14,7 +14,9 @@ function onScann(qrData) {
 
     setTimeout(() => {
         console.log('Redirecionando para:', formURL);
-        window.location.href = formURL;
+
+        window.open(formURL, '_blank');
+        // window.location.href = formURL;
     })
 }
 
