@@ -1,20 +1,25 @@
-function onScanSuccess(qrData) {
-        document.getElementById("status").innerText =
-          "QR Code detectado! Redirecionando...";
+function onScann(qrData) {
+    const [codigo, posicao] = qrData.split(';');
+    
+    if(!codigo || !posicao) {
+        console.error('Formato do QR Code inválido.');
+        
+    }
+    console.log('QR Code detectado:', qrData);
+    console.log('Código:', codigo);
+    console.log('Posição:', posicao);
 
-        const [codigo, localizador] = qrData.split(";");
+    document.getElementById('status').innerText = 'QR Code detectado! Redirecionando...';
+    const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${codigo}&entry.121876877=${posicao}`;
 
-        // Redireciona para o Google Forms com os dados
-        const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSdfgQWERTYUIOPASDFGHJKLJKLJKLJKLJKLJKLJKL/viewform?usp=pp_url&entry.1234567890=${codigo}&entry.0987654321=${localizador}`;
-
+    setTimeout(() => {
+        console.log('Redirecionando para:', formURL);
         window.location.href = formURL;
-      }
+    })
+}
 
-      new Html5Qrcode("reader").start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: 250,
-        },
-        onScanSuccess
-      );
+new Html5Qrcode("reader").start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    onScann
+)
