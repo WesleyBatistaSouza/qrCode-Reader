@@ -17,7 +17,9 @@ function onScann(qrData) {
 
         window.open(formURL, '_blank');
         // window.location.href = formURL;
-    })
+    } , 2000);
+    html5QrcodeScanner.clear();
+    html5QrcodeScanner.render(onScann);
 }
 
 new Html5Qrcode("reader").start(
