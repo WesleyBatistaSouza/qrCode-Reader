@@ -15,3 +15,7 @@ body {
       #reader.active button {
         display: block;
       }
+
+      .file-upload {
+        display: none;
+      }

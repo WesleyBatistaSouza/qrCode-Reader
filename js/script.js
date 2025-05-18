@@ -101,6 +101,6 @@ buttonStopScan.addEventListener("click", () => {
   scanner.clear();
   redirecionado = false;
 });
-scanner
-  .start({ facingMode: "environment" }, { fps: 10, qrbox: 450 }, onScann)
-  .catch((err) => console.error("Erro ao iniciar o scanner:", err));
+// scanner
+//   .start({ facingMode: "environment" }, { fps: 10, qrbox: 450 }, onScann)
+//   .catch((err) => console.error("Erro ao iniciar o scanner:", err));
