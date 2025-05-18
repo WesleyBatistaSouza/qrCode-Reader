@@ -7,3 +7,11 @@ body {
         width: 300px;
         margin: auto;
       }
+
+      button {
+        display: block;
+      }
+
+      #reader.active button {
+        display: block;
+      }
