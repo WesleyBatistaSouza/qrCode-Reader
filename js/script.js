@@ -133,7 +133,7 @@ function onScann(qrData) {
 }
 
 const buttonStartScan = document.getElementById("startScan");
-const buttonStopScan = document.getElementById("stopScan");
+// const buttonStopScan = document.getElementById("stopScan");
 
 buttonStartScan.addEventListener("click", () => {
   scanner
@@ -141,16 +141,16 @@ buttonStartScan.addEventListener("click", () => {
     .catch((err) => console.error("Erro ao iniciar o scanner:", err));
 });
 
-buttonStopScan.addEventListener("click", () => {
-  scanner
-    .stop()
-    .then(() => {
-      redirecionado = false;
-      console.log("Scanner stopped.");
-    })
-    .catch((err) => {
-      console.error("Erro ao parar o scanner:", err);
-    });
-  scanner.clear();
-  redirecionado = false;
-});
+// buttonStopScan.addEventListener("click", () => {
+//   scanner
+//     .stop()
+//     .then(() => {
+//       redirecionado = false;
+//       console.log("Scanner stopped.");
+//     })
+//     .catch((err) => {
+//       console.error("Erro ao parar o scanner:", err);
+//     });
+//   scanner.clear();
+//   redirecionado = false;
+// });
