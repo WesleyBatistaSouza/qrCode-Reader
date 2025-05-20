@@ -31,6 +31,12 @@ body {
   padding: 20px;
 }
 
+.header p {
+  font-size: 1.6rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
 .container {
   background-color: white;
   border-radius: 10px;
@@ -43,7 +49,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 95dvh;
 }
 
 h1 {
@@ -68,6 +74,10 @@ p {
   padding: 10px;
   margin-top: 10rem;
   display: block;
+  width: 100%;
+  display: flex;
+  gap: 40px;
+  justify-content: center;  
 }
 
 button {
