@@ -11,6 +11,24 @@
   </head>
   <body>
     <main class="container">
+
+
+<div id="loadingContainer" class="hidden">
+  <div class="loading-content">
+    <dotlottie-player
+      src="https://lottie.host/ad85d776-57b6-4f70-9ca8-76977c3d1391/x23ERGUuKZ.lottie"
+      background="transparent"
+      speed="1"
+      style="width: 200px; height: 200px"
+      loop
+      autoplay
+    ></dotlottie-player>
+    <p>Redirecionando...</p>
+    <a href="https://www.linkedin.com/in/wesleybatistasouza" target="_blank">Criado por: Wesley</a>
+  </div>
+</div>
+
+
       <div class="header">
         <h1>Leitor de QR Code - Almoxarifado</h1>
         <div id="reader"></div>
@@ -18,13 +36,18 @@
       </div>
 
       <div class="buttons">
-        <button id="startScan" class="StartScan">Scannear</button>
+        <button id="code" class="StartScan">Ler Código</button>
+        <!-- <button id="posicao" class="posicao">Ler Posição</button> -->
       </div>
       <div>
-        <h2>Último QR Code</h2>
-        <p id="result"></p>
+        <h2>Último Código:</h2>
+        <h3 id="result"></p>
       </div>
     </main>
+    <footer>
+      <!-- <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+<dotlottie-player src="https://lottie.host/ad85d776-57b6-4f70-9ca8-76977c3d1391/x23ERGUuKZ.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player> -->
+    </footer>
     <!-- <div class="file-upload">
         Carregue uma imagem
         <input type="file" id="fileInput" accept="image/*" />

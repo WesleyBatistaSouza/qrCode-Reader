@@ -1,5 +1,10 @@
 const scanner = new Html5Qrcode("reader");
+let ultimaPosicaoLida = null;
 let redirecionado = false;
+let scannerAtivo = false;
+
+const startScanCode = document.getElementById("code");
+// const startScanPosition = document.getElementById("posicao");
 
 window.addEventListener("load", () => {
   const historico = JSON.parse(localStorage.getItem("qrCodeData")) || [];
@@ -20,11 +25,83 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+function iniciarScannerCode() {
+  scanner
+    .start({ facingMode: "environment" }, { fps: 10, qrbox: 450 }, onScann)
+    .then(() => {
+      console.log("Scanner iniciado.");
+      scannerAtivo = true;
+    })
+    .catch((err) => {
+      console.error("Erro ao iniciar o scanner:", err);
+    });
+}
+function iniciarScannerPosicao() {
+  scanner
+    .start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 450 },
+      onScanPosition
+    )
+    .then(() => {
+      console.log("Scanner iniciado.");
+      scannerAtivo = true;
+    })
+    .catch((err) => {
+      console.error("Erro ao iniciar o scanner:", err);
+    });
+}
+
+function pararScanner() {
+  scanner
+    .stop()
+    .then(() => {
+      console.log("Scanner parado.");
+      scannerAtivo = false;
+    })
+    .catch((err) => {
+      console.error("Erro ao parar o scanner:", err);
+    });
+
+  startScanCode.innerHTML = "Ler Código";
+  startScanCode.style.backgroundColor = "#008000";
+
+  // startScanPosition.innerHTML = "Ler Código";
+  // startScanPosition.style.backgroundColor = "#008000";
+}
+
+
+
+function onScanPosition(posicaoLida) {
+  const status = document.getElementById("status");
+
+  const padraoPosicao = /^[A-Z][0-9][A-Z][0-9]$/;
+
+  if (!padraoPosicao.test(posicaoLida)) {
+    status.innerHTML = "Posição inválida!";
+    status.style.color = "red";
+    return "";
+  }
+
+  const success = `Posição lida com sucesso! - ${posicaoLida}`;
+  status.innerHTML = success;
+  status.style.color = "green";
+
+  return posicaoLida;
+}
+
 function onScann(qrData) {
   if (redirecionado) return;
   redirecionado = true;
+  const dataPosition = onScanPosition(ultimaPosicaoLida);
+  const dataCode = qrData;
 
-  const [codigo, posicao] = qrData.split(";");
+  const codigoPosicao = `${dataCode};${dataPosition}`;
+  const codigoPosicaoSeparado = codigoPosicao.split(";");
+
+  const codigo = codigoPosicaoSeparado[0];
+  const posicao = codigoPosicaoSeparado[1];
+
   const status = document.getElementById("status");
 
   const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
@@ -37,7 +114,6 @@ function onScann(qrData) {
 
   const timestamp = Date.now();
 
-  // Salva o código lido no localStorage
   let saveQrData = JSON.parse(localStorage.getItem("qrCodeData")) || [];
 
   saveQrData.push({
@@ -46,9 +122,10 @@ function onScann(qrData) {
     timestamp: timestamp,
   });
 
+  console.log("Chegou", saveQrData);
   if (saveQrData.length > 2) {
     console.log("Limite de 3 QR Codes atingido. Removendo o mais antigo.");
-    saveQrData = saveQrData.slice(-2); 
+    saveQrData = saveQrData.slice(-2);
   }
 
   localStorage.setItem("qrCodeData", JSON.stringify(saveQrData));
@@ -59,98 +136,74 @@ function onScann(qrData) {
 
   saveQrData.forEach((item) => {
     const itemPosicao = item.posicao;
-    if(itemPosicao === undefined) {
-      resultadoQrCode.innerHTML += `${item.codigo} - sem posição <br>`;
+    const itemCodigo = item.codigo;
+
+    if (itemPosicao === "") {
+      
+      resultadoQrCode.innerHTML += `${itemCodigo} - sem posição <br>`;
     } else {
-      resultadoQrCode.innerHTML += `${item.codigo} - ${item.posicao} <br>`;
+      resultadoQrCode.innerHTML += `${itemCodigo} - ${itemPosicao} <br>`;
     }
   });
 
   if (posicao) {
-    const success = "Lido com sucesso! Contém Código e Posição.";
+    const success = "Lido e enviado com sucesso! Deseja ler um novo QR Code?";
     status.innerHTML = success;
     status.style.color = "green";
 
-    if (success) {
-      status.innerHTML = "Já foi enviado! Deseja ler um novo QR Code?";
-      status.style.color = "#111";
+    const loadingContainer = document.getElementById("loadingContainer");
+loadingContainer.classList.remove("hidden");
+    setTimeout(() => {
+      loadingContainer.classList.add("hidden");
+    }, 5000);
+
+    const formWindow = window.open(formURL, "_blank");
+
+    if (formWindow) {
+      formWindow.opener = null;
+    } else {
+      alert("Por favor, permita pop-ups para este site.");
+    }
+    if (formWindow) {
+      formWindow.focus();
+    } else {
+      alert("Por favor, permita pop-ups para este site.");
     }
 
-    async function openForm() {
-      const formWindow = window.open(formURL, "_blank");
-
-      if (formWindow) {
-        formWindow.opener = null;
-      } else {
-        alert("Por favor, permita pop-ups para este site.");
-      }
-      if (formWindow) {
-        formWindow.focus();
-      } else {
-        alert("Por favor, permita pop-ups para este site.");
-      }
-    }
-    openForm();
-
-    scanner
-      .stop()
-      .then(() => {
-        redirecionado = false;
-        console.log("Scanner stopped.");
-      })
-      .catch((err) => {
-        console.error("Erro ao parar o scanner:", err);
-      });
-    scanner.clear();
-    redirecionado = false;
+    pararScanner();
   } else {
     const success = "Lido com sucesso! Contém somente Código";
     status.innerHTML = success;
     status.style.color = "green";
 
-    if (success) {
-      status.innerHTML = "Já foi enviado! Deseja ler um novo QR Code?";
-      status.style.color = "brown";
-    }
-
     const formWindow = window.open(formURLCode, "_blank");
     if (formWindow) {
       formWindow.opener = null;
     }
-
-    scanner
-      .stop()
-      .then(() => {
-        redirecionado = false;
-        console.log("Scanner stopped.");
-      })
-      .catch((err) => {
-        console.error("Erro ao parar o scanner:", err);
-      });
-    scanner.clear();
-    redirecionado = false;
+    pararScanner();
   }
 }
 
-const buttonStartScan = document.getElementById("startScan");
-// const buttonStopScan = document.getElementById("stopScan");
-
-buttonStartScan.addEventListener("click", () => {
-  scanner
-    .start({ facingMode: "environment" }, { fps: 10, qrbox: 450 }, onScann)
-    .catch((err) => console.error("Erro ao iniciar o scanner:", err));
+startScanCode.addEventListener("click", () => {
+  if (scannerAtivo) {
+    startScanCode.innerHTML = "Ler Código";
+    startScanCode.style.backgroundColor = "#008000";
+    pararScanner();
+  } else {
+    startScanCode.innerHTML = "Parar Scanner";
+    startScanCode.style.backgroundColor = "#ff1c1c";
+    iniciarScannerCode();
+  }
 });
 
-// buttonStopScan.addEventListener("click", () => {
-//   scanner
-//     .stop()
-//     .then(() => {
-//       redirecionado = false;
-//       console.log("Scanner stopped.");
-//     })
-//     .catch((err) => {
-//       console.error("Erro ao parar o scanner:", err);
-//     });
-//   scanner.clear();
-//   redirecionado = false;
+// startScanPosition.addEventListener("click", () => {
+//   if (scannerAtivo) {
+//     startScanPosition.innerHTML = "Ler Código";
+//     startScanPosition.style.backgroundColor = "#008000";
+//     pararScanner();
+//   } else {
+//     startScanPosition.innerHTML = "Parar Scanner";
+//     startScanPosition.style.backgroundColor = "#ff1c1c";
+//     iniciarScannerPosicao();
+//   }
 // });

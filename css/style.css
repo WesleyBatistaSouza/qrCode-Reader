@@ -6,10 +6,10 @@
   font-family: sans-serif;
 }
 
-#reader {
+/* #reader {
   width: 300px;
   margin: auto;
-}
+} */
 
 #reader.active button {
   display: block;
@@ -92,7 +92,7 @@ button {
 }
 
 button:nth-child(1) {
-  background-color: green;
+  background-color: #008000;
 }
 
 button:nth-child(1):hover {
@@ -100,10 +100,63 @@ button:nth-child(1):hover {
 }
 
 button:nth-child(2) {
-  background-color: rgb(175, 4, 4);
+  background-color: #af0404;
 }
 
 button:nth-child(2):hover {
   background-color: #ff1c1c;
 }
 
+#reader {
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+}
+#status {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+button.scanning {
+  background-color: #ff1c1c; /* vermelho */
+}
+
+#result {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 2rem;
+}
+
+/* em fase de teste */
+
+#loadingContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(34, 40, 49, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+}
+
+#loadingContainer.hidden {
+  display: none;
+}
+
+.loading-content {
+  text-align: center;
+  color: #f2f2f2;
+}
+
+.loading-content a {
+  color: #f96d00;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 10px;
+  display: inline-block;
+}
