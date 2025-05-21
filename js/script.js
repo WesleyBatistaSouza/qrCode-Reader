@@ -108,11 +108,9 @@ function onScann(qrData) {
     codigo
   )}&entry.121876877=${encodeURIComponent(posicao)}`;
 
-  // https://docs.google.com/forms/d/e/1FAIpQLScq4IFGy7ag2vgMk-_TP90wDPkRdp-zclxDS3gQ9L37D982_w/viewform?usp=pp_url&entry.1257467549=35050922
-
-  const formURLCode = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
-    codigo
-  )}`;
+  // const formURLCode = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
+  //   codigo
+  // )}`;
 
   const timestamp = Date.now();
 
