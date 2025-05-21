@@ -104,9 +104,11 @@ function onScann(qrData) {
 
   const status = document.getElementById("status");
 
-  const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
-    codigo
-  )}&entry.121876877=${encodeURIComponent(posicao)}`;
+  
+  const formURLCode = `https://docs.google.com/forms/d/e/1FAIpQLScFcGIl0yXDTynZfGduxke3vUpxAPAupHfwo5hwixlyKkZqvw/viewform?usp=pp_url&entry.913854003=${encodeURIComponent(codigo)}`
+   const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
+     codigo
+   )}&entry.121876877=${encodeURIComponent(posicao)}`;
 
   // const formURLCode = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
   //   codigo
