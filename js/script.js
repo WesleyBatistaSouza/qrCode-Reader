@@ -1,10 +1,8 @@
 const scanner = new Html5Qrcode("reader");
-let ultimaPosicaoLida = null;
 let redirecionado = false;
 let scannerAtivo = false;
 
 const startScanCode = document.getElementById("code");
-// const startScanPosition = document.getElementById("posicao");
 
 window.addEventListener("load", () => {
   const historico = JSON.parse(localStorage.getItem("qrCodeData")) || [];
@@ -21,28 +19,14 @@ window.addEventListener("DOMContentLoaded", () => {
   localStorage.setItem("qrCodeData", JSON.stringify(saveQrData));
   resultadoQrCode.innerHTML = "";
   saveQrData.forEach((item) => {
-    resultadoQrCode.innerHTML += `${item.codigo} - ${item.posicao} <br>`;
+    resultadoQrCode.innerHTML += `${item.codigo}<br>`;
   });
 });
 
 function iniciarScannerCode() {
+  redirecionado = false;
   scanner
     .start({ facingMode: "environment" }, { fps: 10, qrbox: 450 }, onScann)
-    .then(() => {
-      console.log("Scanner iniciado.");
-      scannerAtivo = true;
-    })
-    .catch((err) => {
-      console.error("Erro ao iniciar o scanner:", err);
-    });
-}
-function iniciarScannerPosicao() {
-  scanner
-    .start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 450 },
-      onScanPosition
-    )
     .then(() => {
       console.log("Scanner iniciado.");
       scannerAtivo = true;
@@ -65,125 +49,102 @@ function pararScanner() {
 
   startScanCode.innerHTML = "Ler Código";
   startScanCode.style.backgroundColor = "#008000";
-
-  // startScanPosition.innerHTML = "Ler Código";
-  // startScanPosition.style.backgroundColor = "#008000";
+  scanner.clear();
+  redirecionado = false;
 }
 
+let formConfig = {
+  baseUrl: "",
+  entryCodigo: "",
+};
 
+const salvarFormBtn = document.getElementById("salvar-form");
 
-function onScanPosition(posicaoLida) {
-  const status = document.getElementById("status");
+salvarFormBtn.addEventListener("click", () => {
+  const urlInput = document.getElementById("form-url").value;
 
-  const padraoPosicao = /^[A-Z][0-9][A-Z][0-9]$/;
+  try {
+    const url = new URL(urlInput);
+    const params = new URLSearchParams(url.search);
 
-  if (!padraoPosicao.test(posicaoLida)) {
-    status.innerHTML = "Posição inválida!";
-    status.style.color = "red";
-    return "";
+    formConfig.baseUrl = url.origin + url.pathname;
+    const entryKeys = [];
+    for (const [key] of params.entries()) {
+      if (key.startsWith("entry.")) {
+        entryKeys.push(key);
+      }
+    }
+
+    if (entryKeys.length === 0) {
+      alert("URL inválida: nenhum parâmetro 'entry.xxx' encontrado.");
+      return;
+    }
+
+    formConfig.entryCodigo = entryKeys[0];
+
+    localStorage.setItem("formConfig", JSON.stringify(formConfig));
+    alert("Formulário salvo com sucesso!");
+  } catch (error) {
+    alert("URL inválida!");
+    console.error(error);
   }
-
-  const success = `Posição lida com sucesso! - ${posicaoLida}`;
-  status.innerHTML = success;
-  status.style.color = "green";
-
-  return posicaoLida;
-}
+});
 
 function onScann(qrData) {
   if (redirecionado) return;
   redirecionado = true;
-  const dataPosition = onScanPosition(ultimaPosicaoLida);
-  const dataCode = qrData;
 
-  const codigoPosicao = `${dataCode};${dataPosition}`;
-  const codigoPosicaoSeparado = codigoPosicao.split(";");
+  const beep = document.getElementById("beep-sound");
+  beep.play();
 
-  const codigo = codigoPosicaoSeparado[0];
-  const posicao = codigoPosicaoSeparado[1];
-
+  const codigo = qrData;
   const status = document.getElementById("status");
 
-  
-  const formURLCode = `https://docs.google.com/forms/d/e/1FAIpQLScFcGIl0yXDTynZfGduxke3vUpxAPAupHfwo5hwixlyKkZqvw/viewform?usp=pp_url&entry.913854003=${encodeURIComponent(codigo)}`
-   const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
-     codigo
-   )}&entry.121876877=${encodeURIComponent(posicao)}`;
-
-  // const formURLCode = `https://docs.google.com/forms/d/e/1FAIpQLSc252C0y10xv_MSFQTR8zN1niY6g7C_N7sweVk7GffBHArkKg/viewform?usp=pp_url&entry.1877566771=${encodeURIComponent(
-  //   codigo
-  // )}`;
+  const formConfigStorage =
+    JSON.parse(localStorage.getItem("formConfig")) || {};
+  const baseUrl = formConfigStorage.baseUrl;
+  const entryCodigo = formConfigStorage.entryCodigo;
+  console.log("Base URL:", baseUrl);
+  console.log("Entry Código:", entryCodigo);
+  const formURLCode = `${baseUrl}?usp=pp_url&${entryCodigo}=${encodeURIComponent(
+    codigo
+  )}`;
+  console.log("Form URL:", formURLCode);
 
   const timestamp = Date.now();
-
   let saveQrData = JSON.parse(localStorage.getItem("qrCodeData")) || [];
 
   saveQrData.push({
     codigo: codigo,
-    posicao: posicao,
     timestamp: timestamp,
   });
 
-  console.log("Chegou", saveQrData);
   if (saveQrData.length > 2) {
-    console.log("Limite de 3 QR Codes atingido. Removendo o mais antigo.");
     saveQrData = saveQrData.slice(-2);
   }
 
   localStorage.setItem("qrCodeData", JSON.stringify(saveQrData));
-  console.log("Dados salvos:", saveQrData);
 
   const resultadoQrCode = document.getElementById("result");
   resultadoQrCode.innerHTML = "";
 
   saveQrData.forEach((item) => {
-    const itemPosicao = item.posicao;
-    const itemCodigo = item.codigo;
-
-    if (itemPosicao === "") {
-      
-      resultadoQrCode.innerHTML += `${itemCodigo} - sem posição <br>`;
-    } else {
-      resultadoQrCode.innerHTML += `${itemCodigo} - ${itemPosicao} <br>`;
-    }
+    resultadoQrCode.innerHTML += `${item.codigo}<br>`;
   });
 
-  if (posicao) {
-    const success = "Lido e enviado com sucesso! Deseja ler um novo QR Code?";
-    status.innerHTML = success;
-    status.style.color = "green";
+  const success = "Lido com sucesso! Contém somente Código";
+  status.innerHTML = success;
+  status.style.color = "green";
 
-    const loadingContainer = document.getElementById("loadingContainer");
-loadingContainer.classList.remove("hidden");
-    setTimeout(() => {
-      loadingContainer.classList.add("hidden");
-    }, 5000);
-
-    const formWindow = window.open(formURL, "_blank");
-
-    if (formWindow) {
-      formWindow.opener = null;
-    } else {
-      alert("Por favor, permita pop-ups para este site.");
-    }
-    if (formWindow) {
-      formWindow.focus();
-    } else {
-      alert("Por favor, permita pop-ups para este site.");
-    }
-
-    pararScanner();
+  const formWindow = window.open(formURLCode, "_blank");
+  if (formWindow) {
+    formWindow.opener = null;
+    formWindow.focus();
   } else {
-    const success = "Lido com sucesso! Contém somente Código";
-    status.innerHTML = success;
-    status.style.color = "green";
-
-    const formWindow = window.open(formURLCode, "_blank");
-    if (formWindow) {
-      formWindow.opener = null;
-    }
-    pararScanner();
+    alert("Por favor, permita pop-ups para este site.");
   }
+
+  pararScanner();
 }
 
 startScanCode.addEventListener("click", () => {
@@ -197,15 +158,3 @@ startScanCode.addEventListener("click", () => {
     iniciarScannerCode();
   }
 });
-
-// startScanPosition.addEventListener("click", () => {
-//   if (scannerAtivo) {
-//     startScanPosition.innerHTML = "Ler Código";
-//     startScanPosition.style.backgroundColor = "#008000";
-//     pararScanner();
-//   } else {
-//     startScanPosition.innerHTML = "Parar Scanner";
-//     startScanPosition.style.backgroundColor = "#ff1c1c";
-//     iniciarScannerPosicao();
-//   }
-// });
